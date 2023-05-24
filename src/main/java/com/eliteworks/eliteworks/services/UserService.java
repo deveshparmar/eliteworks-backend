@@ -2,13 +2,11 @@ package com.eliteworks.eliteworks.services;
 
 import com.eliteworks.eliteworks.models.User;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -56,15 +54,19 @@ public class UserService {
 
     public String loginUser(User user) throws ExecutionException, InterruptedException {
         Firestore firestore = FirestoreClient.getFirestore();
-        DocumentReference userRef = firestore.collection("users").document(user.getId());
-        ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = userRef.get();
-        DocumentSnapshot documentSnapshot = documentSnapshotApiFuture.get();
+        CollectionReference usersCollection = firestore.collection("users");
 
-        if (documentSnapshot.exists()) {
-            // User exists, check if credentials match
+        Query query = usersCollection.whereEqualTo("email", user.getEmail()).limit(1);
+        ApiFuture<QuerySnapshot> querySnapshotFuture = query.get();
+
+        QuerySnapshot querySnapshot = querySnapshotFuture.get();
+        List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+
+        if (!documents.isEmpty()) {
+            DocumentSnapshot documentSnapshot = documents.get(0);
             User existingUser = documentSnapshot.toObject(User.class);
-            if (existingUser != null && existingUser.getPassword().equals(user.getPassword()) && existingUser.getEmail().equals(user.getEmail())) {
-                return user.getId();
+            if (existingUser.getPassword().equals(user.getPassword())) {
+                return existingUser.getId();
             } else {
                 return "Invalid credentials";
             }
