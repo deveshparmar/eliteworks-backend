@@ -15,7 +15,7 @@ public class User {
     private String role;
     private String phoneNo;
     private String gender;
-    private Date dob;
+    private String dob;
     private String address;
     private String photo;
     private boolean isProfileCompleted;
