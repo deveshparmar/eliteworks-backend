@@ -49,5 +49,5 @@ jobs:
         with:
           app-name: 'eliteworks'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_03F9FF53121E4B69855CACBFAA85A2B1 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2D36D771B2DE4DFE8C7BEFDE1173A80F }}
           package: '*.jar'
