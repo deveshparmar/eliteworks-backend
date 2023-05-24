@@ -24,7 +24,7 @@ public class UserService {
             return "User already exists";
         } else {
             ApiFuture<WriteResult> collectionsApiFuture = userRef.set(user);
-            return "User created successfully";
+            return user.getId();
         }
     }
 
@@ -53,4 +53,24 @@ public class UserService {
         ApiFuture<WriteResult>writeResultApiFuture = firestore.collection("users").document(id).delete();
         return "User Deleted - " + id;
     }
+
+    public String loginUser(User user) throws ExecutionException, InterruptedException {
+        Firestore firestore = FirestoreClient.getFirestore();
+        DocumentReference userRef = firestore.collection("users").document(user.getId());
+        ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = userRef.get();
+        DocumentSnapshot documentSnapshot = documentSnapshotApiFuture.get();
+
+        if (documentSnapshot.exists()) {
+            // User exists, check if credentials match
+            User existingUser = documentSnapshot.toObject(User.class);
+            if (existingUser != null && existingUser.getPassword().equals(user.getPassword()) && existingUser.getEmail().equals(user.getEmail())) {
+                return user.getId();
+            } else {
+                return "Invalid credentials";
+            }
+        } else {
+            return "User does not exist";
+        }
+    }
+
 }
