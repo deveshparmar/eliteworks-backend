@@ -39,4 +39,9 @@ public class UserController {
     public ResponseEntity<String> testEndPoint(){
         return ResponseEntity.ok("Working!");
     }
+
+    @PostMapping("/api/loginUser")
+    public String loginUser(@RequestBody User user)throws ExecutionException,InterruptedException{
+        return userService.loginUser(user);
+    }
 }
