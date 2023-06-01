@@ -55,7 +55,7 @@ public class UserController {
         String userId = userService.getIdOfUser(email);
 
         if (!response.startsWith("Invalid")) {
-            String resetUrl = "http://localhost:8080/api/reset-password?token=" + response + "&id=" + userId;
+            String resetUrl = "https://eliteworks.azurewebsites.net/api/reset-password?token=" + response + "&id=" + userId;
              EmailSender.sendPasswordResetEmail(email, resetUrl);
             return ResponseEntity.ok(resetUrl);
         } else {
