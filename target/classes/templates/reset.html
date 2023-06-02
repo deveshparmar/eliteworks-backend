@@ -66,8 +66,8 @@
     <form id="resetForm" action="/api/reset-password" method="POST">
 <!--        <input type="hidden" name="token" value="${token}" />-->
 <!--        <input type="hidden" name="id" value="${id}" />-->
-        <input type="text" name="token" th:value="${token}" />
-        <input type="text" name="id"  th:value="${id}"/>
+        <input type="hidden" name="token" th:value="${token}" />
+        <input type="hidden" name="id"  th:value="${id}"/>
         <label for="password">New Password:</label>
         <input type="password" name="password" id="password" required />
 

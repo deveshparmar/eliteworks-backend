@@ -20,23 +20,30 @@ public class UserController {
     }
 
     @PostMapping("/api/registerUser")
-    public String registerUser(@RequestBody User user) throws ExecutionException, InterruptedException {
-        return userService.createUser(user);
+    public ResponseEntity<String> registerUser(@RequestBody User user) throws ExecutionException, InterruptedException {
+        String response =  userService.createUser(user);
+        if(response.equals("User already exists")) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/api/getUser")
-    public User getUser(@RequestParam String id) throws ExecutionException, InterruptedException {
-        return userService.getUser(id);
+    public ResponseEntity<User> getUser(@RequestParam String id) throws ExecutionException, InterruptedException {
+        User user =userService.getUser(id);
+
+        if(user==null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        else return ResponseEntity.ok(user);
     }
 
     @PutMapping("/api/updateUser")
-    public String updateUser(@RequestBody User user){
-        return userService.updateUser(user);
+    public ResponseEntity<String> updateUser(@RequestBody User user){
+        String response =  userService.updateUser(user);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/api/deleteUser")
-    public String deleteUser(@RequestParam String id){
-        return userService.deleteUser(id);
+    public ResponseEntity<String> deleteUser(@RequestParam String id){
+        String response = userService.deleteUser(id);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/test")
@@ -45,8 +52,10 @@ public class UserController {
     }
 
     @PostMapping("/api/loginUser")
-    public String loginUser(@RequestBody User user)throws ExecutionException,InterruptedException{
-        return userService.loginUser(user);
+    public ResponseEntity<String> loginUser(@RequestBody User user)throws ExecutionException,InterruptedException{
+        String response = userService.loginUser(user);
+        if(response.equals("Invalid credentials") || response.equals("User does not exist")) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/api/forgot-password")
