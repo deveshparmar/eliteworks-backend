@@ -20,14 +20,17 @@ public class UserService {
 
     public String createUser(User user) throws ExecutionException, InterruptedException {
         Firestore firestore = FirestoreClient.getFirestore();
-        DocumentReference userRef = firestore.collection("users").document(user.getId());
-        ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = userRef.get();
-        DocumentSnapshot documentSnapshot = documentSnapshotApiFuture.get();
+        CollectionReference usersCollectionRef = firestore.collection("users");
 
-        if (documentSnapshot.exists()) {
+        Query query = usersCollectionRef.whereEqualTo("email", user.getEmail());
+        ApiFuture<QuerySnapshot> querySnapshotApiFuture = query.get();
+        QuerySnapshot querySnapshot = querySnapshotApiFuture.get();
+
+        if (!querySnapshot.isEmpty()) {
             return "User already exists";
         } else {
-            ApiFuture<WriteResult> collectionsApiFuture = userRef.set(user);
+            DocumentReference newUserRef = usersCollectionRef.document(user.getId());
+            ApiFuture<WriteResult> writeResultApiFuture = newUserRef.set(user);
             return user.getId();
         }
     }
