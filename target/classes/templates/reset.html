@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Eliteworks - Reset Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            color: #333;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        input[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Eliteworks - Reset Password</h2>
+    <form id="resetForm" action="/api/reset-password" method="POST">
+<!--        <input type="hidden" name="token" value="${token}" />-->
+<!--        <input type="hidden" name="id" value="${id}" />-->
+        <input type="hidden" name="token" th:value="${token}" />
+        <input type="hidden" name="id"  th:value="${id}"/>
+        <label for="password">New Password:</label>
+        <input type="password" name="password" id="password" required />
+
+        <label for="confirmPassword">Confirm Password:</label>
+        <input type="password" name="confirmPassword" id="confirmPassword" required />
+
+        <input type="submit" value="Reset Password" />
+    </form>
+    <script>
+    document.getElementById("resetForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirmPassword").value;
+        var tokenInput = document.getElementsByName("token")[0];
+            var idInput = document.getElementsByName("id")[0];
+            var token = tokenInput.value;
+            var id = idInput.value;
+        if (password !== confirmPassword) {
+                alert("Passwords do not match. Please re-enter.");
+                return;
+            }
+        var formAction = "/api/reset-password?token=" + encodeURIComponent(token) + "&password=" + encodeURIComponent(password) + "&id=" + encodeURIComponent(id);
+        document.getElementById("resetForm").action = formAction;
+        document.getElementById("resetForm").submit();
+    });
+</script>
+</div>
+</body>
+</html>

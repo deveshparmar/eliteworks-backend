@@ -3,6 +3,9 @@ package com.eliteworks.eliteworks.services;
 import com.eliteworks.eliteworks.models.User;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +21,8 @@ public class UserService {
 
     private static final long EXPIRE_TOKEN_AFTER_MINUTES = 10;
 
-    public String createUser(User user) throws ExecutionException, InterruptedException {
+    public String createUser(User user) throws ExecutionException, InterruptedException, FirebaseAuthException {
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         Firestore firestore = FirestoreClient.getFirestore();
         CollectionReference usersCollectionRef = firestore.collection("users");
 
@@ -29,6 +33,8 @@ public class UserService {
         if (!querySnapshot.isEmpty()) {
             return "User already exists";
         } else {
+            UserRecord userRecord = firebaseAuth.getUserByEmail(user.getEmail());
+            user.setId(userRecord.getUid());
             DocumentReference newUserRef = usersCollectionRef.document(user.getId());
             ApiFuture<WriteResult> writeResultApiFuture = newUserRef.set(user);
             return user.getId();

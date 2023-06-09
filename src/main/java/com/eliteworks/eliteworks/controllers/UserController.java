@@ -3,6 +3,9 @@ package com.eliteworks.eliteworks.controllers;
 import com.eliteworks.eliteworks.config.EmailSender;
 import com.eliteworks.eliteworks.models.User;
 import com.eliteworks.eliteworks.services.UserService;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,16 +17,37 @@ import java.util.concurrent.ExecutionException;
 @Controller
 public class UserController {
     public UserService userService;
+    public FirebaseAuth firebaseAuth;
 
     public UserController(UserService userService){
         this.userService = userService;
+        this.firebaseAuth = FirebaseAuth.getInstance() ;
     }
 
     @PostMapping("/api/registerUser")
     public ResponseEntity<String> registerUser(@RequestBody User user) throws ExecutionException, InterruptedException {
-        String response =  userService.createUser(user);
-        if(response.equals("User already exists")) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        return ResponseEntity.ok(response);
+        try{
+            firebaseAuth.getUserByEmail(user.getEmail());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User Already exists");
+        } catch (FirebaseAuthException e) {
+
+        }
+
+        UserRecord.CreateRequest request = new UserRecord.CreateRequest()
+                .setEmail(user.getEmail())
+                .setPassword(user.getPassword())
+                .setDisplayName(user.getName());
+
+        try{
+            UserRecord userRecord = firebaseAuth.createUser(request);
+            UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(userRecord.getUid())
+                    .setEmailVerified(true);
+            firebaseAuth.updateUser(updateRequest);
+            String response = userService.createUser(user);
+            return ResponseEntity.ok(response);
+        }catch (FirebaseAuthException e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error registering user");
+        }
     }
 
     @GetMapping("/api/getUser")
