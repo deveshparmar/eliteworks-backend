@@ -6,6 +6,7 @@ import com.eliteworks.eliteworks.services.UserService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 @Controller
 public class UserController {
+    @Autowired
     public UserService userService;
     public FirebaseAuth firebaseAuth;
 
