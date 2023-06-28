@@ -19,16 +19,11 @@ import java.util.concurrent.ExecutionException;
 public class UserController {
     @Autowired
     public UserService userService;
-    public FirebaseAuth firebaseAuth;
-
-    public UserController(UserService userService){
-        this.userService = userService;
-        this.firebaseAuth = FirebaseAuth.getInstance() ;
-    }
 
     @PostMapping("/api/registerUser")
     public ResponseEntity<String> registerUser(@RequestBody User user) throws ExecutionException, InterruptedException {
         try{
+            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
             firebaseAuth.getUserByEmail(user.getEmail());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User Already exists");
         } catch (FirebaseAuthException e) {
@@ -41,6 +36,7 @@ public class UserController {
                 .setDisplayName(user.getName());
 
         try{
+            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
             UserRecord userRecord = firebaseAuth.createUser(request);
             UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(userRecord.getUid())
                     .setEmailVerified(true);
